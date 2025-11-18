@@ -1,0 +1,30 @@
+name: Deploy to Beget nutrition tracker
+on:
+  push:
+    branches:
+      - dev
+jobs:
+  deploy:
+    name: 🚀 Deploy to Beget via FTP
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v3
+      - name: 📤 Sync files to Beget
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: /public_html/wp-content/plugin/nutrition-tracker/
+          exclude: |
+            **/.git*
+            **/.git/**
+            **/.github/**
+            readme.txt
+            .ftp-deploy-sync-state.json
+            README.md
+            .gitignore
+            .DS_Store
