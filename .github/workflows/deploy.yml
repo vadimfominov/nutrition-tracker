@@ -18,7 +18,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./
-          server-dir: /public_html/wp-content/plugin/nutrition-tracker/
+          server-dir: /wp-content/plugin/nutrition-tracker/
           exclude: |
             **/.git*
             **/.git/**
