@@ -11,96 +11,133 @@
 	<?php else: ?>
 
 		<!-- Вкладка продуктов -->
-<div id="products-tab" class="tab-content active">
-    <div class="products-header">
-        <h3>Мои продукты</h3>
-        <button type="button" class="btn-primary" id="open-product-popup">
-            + Добавить продукт
-        </button>
-    </div>
-    
-    <div id="products-list"></div>
-</div>
+		<div id="products-tab" class="tab-content active">
+			<div class="products-header">
+				<h3>Мои продукты</h3>
+				<button type="button" class="btn-primary" id="open-product-popup">
+					+ Добавить продукт
+				</button>
+			</div>
 
-<!-- Попап для добавления продукта -->
-<div id="product-popup" class="popup-overlay">
-    <div class="popup-content">
-        <div class="popup-header">
-            <h3>Добавить новый продукт</h3>
-            <button type="button" class="popup-close" id="close-product-popup">&times;</button>
-        </div>
-        
-        <form id="add-product-form">
-            <div class="form-group">
-                <label>Название продукта:</label>
-                <input type="text" name="name" required placeholder="Введите название продукта">
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Белки (г):</label>
-                    <input type="number" step="0.1" name="proteins" required placeholder="0.0" min="0">
-                </div>
-                 <div class="form-group">
-                    <label>Жиры (г):</label>
-                    <input type="number" step="0.1" name="fats" required placeholder="0.0" min="0">
-                </div>
-                
-            </div>
-            
-            <div class="form-row">
-               <div class="form-group">
-                    <label>Углеводы (г):</label>
-                    <input type="number" step="0.1" name="carbs" required placeholder="0.0" min="0">
-                </div>
-                <div class="form-group">
-                    <label>Калории:</label>
-                    <input type="number" step="0.1" name="calories" required placeholder="0.0" min="0">
-                </div>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn-primary">Добавить продукт</button>
-            </div>
-        </form>
-    </div>
-</div>
+			<div id="products-list"></div>
+		</div>
+
+		<!-- Попап для добавления продукта -->
+		<div id="product-popup" class="popup-overlay">
+			<div class="popup-content">
+				<div class="popup-header">
+					<h3>Добавить новый продукт</h3>
+					<button type="button" class="popup-close" id="close-product-popup">&times;</button>
+				</div>
+
+				<form id="add-product-form">
+					<div class="form-group">
+						<input type="text" name="name" required placeholder="Название продукта">
+					</div>
+
+					<div class="form-row">
+						<div class="form-group">
+							<input type="number" step="0.1" name="proteins" required placeholder="Белки (г)" min="0">
+						</div>
+						<div class="form-group">
+							<input type="number" step="0.1" name="fats" required placeholder="Жиры (г)" min="0">
+						</div>
+
+					</div>
+
+					<div class="form-row">
+						<div class="form-group">
+							<input type="number" step="0.1" name="carbs" required placeholder="Углеводы (г)" min="0">
+						</div>
+						<div class="form-group">
+							<input type="number" step="0.1" name="calories" required placeholder="Калории" min="0">
+						</div>
+					</div>
+
+					<div class="form-actions">
+						<button type="submit" class="btn-primary">Добавить продукт</button>
+					</div>
+				</form>
+			</div>
+		</div>
 
 		<!-- Вкладка приемов пищи -->
 		<div id="meals-tab" class="tab-content">
-			<h3>Добавить прием пищи</h3>
-			<form id="add-meal-form">
-				<div class="form-row">
-					<div class="form-group">
-						<label>Дата:</label>
-						<input type="date" name="meal_date" value="<?php echo date('Y-m-d'); ?>" required>
-					</div>
-					<div class="form-group">
-						<label>Тип приема пищи:</label>
-						<select name="meal_type" required>
-							<option value="breakfast">Завтрак</option>
-							<option value="lunch">Обед</option>
-							<option value="dinner">Ужин</option>
-							<option value="snack">Перекус</option>
-						</select>
-					</div>
-				</div>
-
-				<h4>Выберите продукты:</h4>
-				<div id="products-selection" class="products-selection">
-					<!-- Список продуктов будет загружен здесь -->
-					<p>Загрузка продуктов...</p>
-				</div>
-
-				<button type="submit" class="add-meal-btn">Добавить в прием пищи</button>
-			</form>
-
-			<h3>Приемы пищи за <span id="current-date"><?php echo date('d.m.Y'); ?></span></h3>
-			<div class="form-group">
-				<label>Выберите дату для просмотра:</label>
-				<input type="date" id="view-meals-date" value="<?php echo date('Y-m-d'); ?>">
-				<!-- <button type="button" id="load-meals-btn">Показать приемы пищи</button> -->
+			<div class="meals-header">
+				<h3>Мои приемы пищи</h3>
+				<button type="button" class="btn-primary" id="open-meals-popup">
+					+ Добавить приём пищи
+				</button>
 			</div>
+
+			<div id="meals-popup" class="popup-overlay">
+				<div class="popup-content">
+					<div class="popup-header">
+						<h3>Добавить новый приём пищи</h3>
+						<button type="button" class="popup-close" id="close-meals-popup">&times;</button>
+					</div>
+
+					<form id="add-meal-form">
+						<!-- Шаг 1: Дата и тип приема пищи -->
+						<div class="step step1 active">
+							<div class="form-row">
+								<div class="form-group">
+									<label>Дата:</label>
+									<input type="date" name="meal_date" value="<?php echo date('Y-m-d'); ?>" required>
+								</div>
+
+								<div class="form-group">
+									<label>Тип приема пищи:</label>
+									<div class="radio-group">
+										<input type="radio" id="breakfast" name="meal_type" value="breakfast" class="radio-option" required>
+										<label for="breakfast" class="radio-label">Завтрак</label>
+
+										<input type="radio" id="snack1" name="meal_type" value="snack" class="radio-option">
+										<label for="snack1" class="radio-label">Перекус 11.00</label>
+
+										<input type="radio" id="lunch" name="meal_type" value="lunch" class="radio-option">
+										<label for="lunch" class="radio-label">Обед</label>
+
+										<input type="radio" id="dinner" name="meal_type" value="dinner" class="radio-option">
+										<label for="dinner" class="radio-label">Ужин</label>
+
+										<input type="radio" id="snack2" name="meal_type" value="snack" class="radio-option">
+										<label for="snack2" class="radio-label">Перекус 19.30</label>
+									</div>
+								</div>
+							</div>
+
+							<div class="navigation-buttons">
+								<button type="button" class="nav-btn next-btn">Далее</button>
+							</div>
+						</div>
+
+						<!-- Шаг 2: Выбор продуктов -->
+						<div class="step step2">
+							<button type="button" class="nav-btn prev-btn">Назад</button>
+							<h4>Выберите продукты:</h4>
+							<div id="products-selection" class="products-selection">
+								<!-- Список продуктов будет загружен здесь -->
+								<p>Загрузка продуктов...</p>
+							</div>
+
+							<div class="navigation-buttons">
+
+								<button type="submit" class="add-meal-btn">Добавить в прием пищи</button>
+							</div>
+						</div>
+					</form>
+
+				</div>
+			</div>
+
+			<div class="meals-filter">
+				<h3 style="margin-top: 20px;">Приемы пищи за <span id="current-date"><?php echo date('d.m.Y'); ?></span></h3>
+				<div class="form-group">
+					<input type="date" id="view-meals-date" value="<?php echo date('Y-m-d'); ?>">
+				</div>
+			</div>
+
 			<div id="today-meals"></div>
 		</div>
 
@@ -110,7 +147,6 @@
 
 			<!-- Статистика за неделю -->
 			<div id="weekly-stats-content" class="stats-content">
-
 
 				<!-- График калорий за неделю -->
 				<div class="weekly-chart-container">
@@ -134,9 +170,6 @@
 							<label>Выберите неделю:</label>
 							<input type="week" id="week-selector" value="<?php echo date('Y-\WW'); ?>">
 						</div>
-						<!-- <button type="button" id="load-weekly-stats" class="stats-btn">
-							📊 Загрузить статистику
-						</button> -->
 					</div>
 				</div>
 
@@ -152,7 +185,7 @@
 		<div id="profile-tab" class="tab-content">
 			<h3>Мой профиль</h3>
 			<form id="profile-form">
-			
+
 				<div class="form-group">
 					<label>Имя:</label>
 					<input type="text" name="first_name" value="<?php echo wp_get_current_user()->first_name; ?>">

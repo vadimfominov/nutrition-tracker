@@ -3,8 +3,8 @@
 /**
  * Plugin Name: Nutrition Tracker
  * Description: Приложение для учета питания и нутриентов
- * Version: 1.1
- * Author: Your Name
+ * Version: 1.1.0
+ * Author: Vadim Fominov
  */
 
 // Безопасность

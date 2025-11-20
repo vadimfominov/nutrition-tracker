@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-	console.log('Nutrition Tracker loaded');
-
 	const shouldLogout = sessionStorage.getItem('should_logout');
 	if (shouldLogout) {
 		console.log('🔄 Skipping auth due to recent logout');
@@ -18,11 +16,16 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (document.querySelector('.nutrition-tabs')) {
 		initTabs();
 		initProductForm();
+		initMealsForm();
 		initMealForm();
 		initStats();
 		initProfileForm();
 		loadProducts();
 	}
+
+	const steps = document.querySelectorAll('.step');
+	const nextBtn = document.querySelector('.next-btn');
+	const prevBtn = document.querySelector('.prev-btn');
 
 	function initTabs() {
 		const tabButtons = document.querySelectorAll('.tab-button');
@@ -37,7 +40,11 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function initProductForm() {
-	    initProductPopup();
+		initProductPopup();
+	}
+
+	function initMealsForm() {
+		initMealsPopup();
 	}
 
 	function initStats() {
@@ -123,15 +130,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				if (products.length > 0) {
 					products.forEach(product => {
+
+						const { name, proteins, fats, carbs, calories } = product
 						html += `
-									<div class="product-card">
-										 <h4>${product.name}</h4>
-										 <p data-value="${product.proteins}г">Белки: ${product.proteins}г</p>
-										 <p data-value="${product.carbs}г">Углеводы: ${product.carbs}г</p>
-										 <p data-value="${product.fats}г">Жиры: ${product.fats}г</p>
-										 <p data-value="${product.calories}г">Калории: ${product.calories}</p>
+									<div class="meal-item product-card">
+										 <div class="meal-item-info">
+											  <div class="meal-item-name">${name}</div>
+											  <div class="meal-item-details">
+													Белки: ${proteins}г | Жиры: ${fats}г | Углеводы: ${carbs}г <br>Калории: ${calories} ккал
+											  </div>
+										 </div>
 									</div>
-							  `;
+									`;
 					});
 				} else {
 					html += '<p>Пока нет добавленных продуктов</p>';
@@ -204,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						 `;
 					});
 				} else {
-					html = '<p>У вас пока нет продуктов. Добавьте продукты во вкладке "Продукты".</p>';
+					html = '<p style="padding:18px;">У вас пока нет продуктов.</p>';
 				}
 
 				container.innerHTML = html;
@@ -292,6 +302,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						showNotification(`Все продукты (${successfulRequests}) успешно добавлены в прием пищи!`, 'success');
 						form.reset();
 						loadTodayMeals();
+						closeMealsPopup();
 
 						// Сбрасываем чекбоксы
 						document.querySelectorAll('input[name="selected_products[]"]').forEach(cb => {
@@ -373,7 +384,7 @@ document.addEventListener('DOMContentLoaded', function () {
 										 <div class="meal-item-info">
 											  <div class="meal-item-name">${meal.name}</div>
 											  <div class="meal-item-details">
-													Белки: ${proteins}г | Углеводы: ${carbs}г | Жиры: ${fats}г <br>Калории: ${calories}
+													Белки: ${proteins}г | Жиры: ${fats}г | Углеводы: ${carbs}г <br>Калории: ${calories} ккал
 											  </div>
 										 </div>
 										 <div class="meal-item-grams">${meal.grams}г</div>
@@ -441,11 +452,10 @@ document.addEventListener('DOMContentLoaded', function () {
 				loadProducts();
 				break;
 			case 'meals':
-				loadProductsSelection(); // Заменяем на новую функцию
 				loadTodayMeals();
+				loadProductsSelection();
 				break;
 			case 'statistics':
-				// loadDailyStats();
 				loadWeeklyStats();
 				break;
 		}
@@ -519,30 +529,17 @@ document.addEventListener('DOMContentLoaded', function () {
 			const dateFormatted = dateObj.toLocaleDateString('ru-RU');
 
 			const progressClass = day.calories <= (day.calorie_goal || 0) ? 'good' : 'exceeded';
-
+			const { proteins, fats, carbs, calorie_goal } = day;
 			html += `
 			  <div class="day-stats-card">
 					<div class="day-stats-header">
 						 <div class="day-date">${dayName} (${dateFormatted})</div>
 						 <div class="day-total-calories ${progressClass}">${Math.round(day.calories)} ккал</div>
 					</div>
-					<div class="day-nutrition">
-						 <div class="nutrition-item">
-							  <span>Белки:</span>
-							  <span class="nutrition-value">${day.proteins.toFixed(1)}г</span>
-						 </div>
-						 <div class="nutrition-item">
-							  <span>Углеводы:</span>
-							  <span class="nutrition-value">${day.carbs.toFixed(1)}г</span>
-						 </div>
-						 <div class="nutrition-item">
-							  <span>Жиры:</span>
-							  <span class="nutrition-value">${day.fats.toFixed(1)}г</span>
-						 </div>
-						 <div class="nutrition-item">
-							  <span>Цель:</span>
-							  <span class="nutrition-value">${day.calorie_goal ? Math.round(day.calorie_goal) + ' ккал' : 'Не задана'}</span>
-						 </div>
+					<div class="meal-item-info">
+						<div class="meal-item-details">
+							Белки: ${proteins.toFixed(1)}г | Жиры: ${fats.toFixed(1)}г | Углеводы: ${carbs.toFixed(1)}г <br>Цель калории: ${Math.round(calorie_goal)} ккал
+						</div>
 					</div>
 			  </div>
 		 `;
@@ -559,35 +556,35 @@ document.addEventListener('DOMContentLoaded', function () {
 		const goalCompletion = summary.calorie_goal ? Math.round((summary.total_calories / (summary.calorie_goal * 7)) * 100) : 0;
 
 		html = `
-		 <h5>Сводка за неделю</h5>
-		 <div class="summary-stats">
-			  <div class="summary-stat">
+			<h5>Сводка за неделю</h5>
+			<div class="summary-stats">
+				<div class="summary-stat">
 					<div class="summary-value">${Math.round(summary.total_calories)}</div>
 					<div class="summary-label">Всего калорий</div>
-			  </div>
-			  <div class="summary-stat">
+				</div>
+				<div class="summary-stat">
 					<div class="summary-value">${avgCalories}</div>
 					<div class="summary-label">Среднее в день</div>
-			  </div>
-			  <div class="summary-stat">
+				</div>
+				<div class="summary-stat">
 					<div class="summary-value">${Math.round(summary.total_proteins)}г</div>
 					<div class="summary-label">Всего белков</div>
-			  </div>
-			  <div class="summary-stat">
-					<div class="summary-value">${Math.round(summary.total_carbs)}г</div>
-					<div class="summary-label">Всего углеводов</div>
-			  </div>
-			  <div class="summary-stat">
+				</div>
+				<div class="summary-stat">
 					<div class="summary-value">${Math.round(summary.total_fats)}г</div>
 					<div class="summary-label">Всего жиров</div>
-			  </div>
-			  ${summary.calorie_goal ? `
-			  <div class="summary-stat">
+				</div>
+				<div class="summary-stat">
+					<div class="summary-value">${Math.round(summary.total_carbs)}г</div>
+					<div class="summary-label">Всего углеводов</div>
+				</div>
+				${summary.calorie_goal ? `
+				<div class="summary-stat">
 					<div class="summary-value ${goalCompletion <= 100 ? 'good' : 'exceeded'}">${goalCompletion}%</div>
 					<div class="summary-label">Выполнение цели</div>
-			  </div>
-			  ` : ''}
-		 </div>
+				</div>
+				` : ''}
+			</div>
 	`;
 
 		container.innerHTML = html;
@@ -645,9 +642,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		const tg = Telegram.WebApp;
 		const tgUser = tg.initDataUnsafe.user;
-
-		console.log('Telegram WebApp detected:', tg);
-		console.log('Telegram user data:', tgUser);
 
 		if (!tgUser || !tgUser.id) {
 			console.error('No Telegram user ID available');
@@ -759,8 +753,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		});
 
-		// 3. УБИРАЕМ обработчик visibilitychange - он вызывает проблемы
-		// 4. УБИРАЕМ обработчик beforeunload - он вызывает проблемы
 	}
 
 	function handleAppClose() {
@@ -826,169 +818,266 @@ document.addEventListener('DOMContentLoaded', function () {
 		notification.className = `notification ${type}`;
 		notification.textContent = message;
 		notification.style.cssText = `
-			position: fixed; top: 20px; right: 20px; 
-			padding: 15px; border-radius: 5px; z-index: 10000;
+			position: fixed; top: 0px; left: 0px; 
+			padding: 10px; border-radius: 0px; z-index: 10000;
 			background: ${type === 'success' ? '#4CAF50' : '#f44336'};
-			color: white;
+			color:white;
+			width:100%;
+			text-align:center;
 			`;
 		document.body.appendChild(notification);
 		setTimeout(() => notification.remove(), 3000);
 	}
 
-// Функции для управления попапом продуктов
-function initProductPopup() {
-    const openBtn = document.getElementById('open-product-popup');
-    const closeBtn = document.getElementById('close-product-popup');
-    const cancelBtn = document.getElementById('cancel-product-form');
-    const popup = document.getElementById('product-popup');
-    const form = document.getElementById('add-product-form');
+	// Функции для управления попапом продуктов
+	function initProductPopup() {
+		const openBtn = document.getElementById('open-product-popup');
+		const closeBtn = document.getElementById('close-product-popup');
+		const cancelBtn = document.getElementById('cancel-product-form');
+		const popup = document.getElementById('product-popup');
+		const form = document.getElementById('add-product-form');
 
-    // Открытие попапа
-    if (openBtn) {
-        openBtn.addEventListener('click', openProductPopup);
-    }
+		// Открытие попапа
+		if (openBtn) {
+			openBtn.addEventListener('click', openProductPopup);
+		}
 
-    // Закрытие попапа
-    if (closeBtn) {
-        closeBtn.addEventListener('click', closeProductPopup);
-    }
+		// Закрытие попапа
+		if (closeBtn) {
+			closeBtn.addEventListener('click', closeProductPopup);
+		}
 
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', closeProductPopup);
-    }
+		if (cancelBtn) {
+			cancelBtn.addEventListener('click', closeProductPopup);
+		}
 
-    // Закрытие по клику на overlay
-    if (popup) {
-        popup.addEventListener('click', function(e) {
-            if (e.target === popup) {
-                closeProductPopup();
-            }
-        });
-    }
+		// Закрытие по клику на overlay
+		if (popup) {
+			popup.addEventListener('click', function (e) {
+				if (e.target === popup) {
+					closeProductPopup();
+				}
+			});
+		}
 
-    // Закрытие по ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && popup.classList.contains('active')) {
-            closeProductPopup();
-        }
-    });
+		// Закрытие по ESC
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && popup.classList.contains('active')) {
+				closeProductPopup();
+			}
+		});
 
-    // Обработка отправки формы
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            addProduct();
-        });
-    }
-}
+		// Обработка отправки формы
+		if (form) {
+			form.addEventListener('submit', function (e) {
+				e.preventDefault();
+				addProduct();
+			});
+		}
+	}
 
-function openProductPopup() {
-    const popup = document.getElementById('product-popup');
-    const form = document.getElementById('add-product-form');
-    
-    if (popup && form) {
-        popup.classList.add('active');
-        // Очищаем форму при открытии
-        form.reset();
-        // Фокусируемся на первом поле
-        const firstInput = form.querySelector('input[name="name"]');
-        if (firstInput) {
-            setTimeout(() => firstInput.focus(), 100);
-        }
-    }
-}
+	function openProductPopup() {
+		const popup = document.getElementById('product-popup');
+		const form = document.getElementById('add-product-form');
 
-function closeProductPopup() {
-    const popup = document.getElementById('product-popup');
-    if (popup) {
-        popup.classList.remove('active');
-    }
-}
+		if (popup && form) {
+			popup.classList.add('active');
+			// Очищаем форму при открытии
+			form.reset();
+			// Фокусируемся на первом поле
+			const firstInput = form.querySelector('input[name="name"]');
+			if (firstInput) {
+				setTimeout(() => firstInput.focus(), 100);
+			}
+		}
+	}
 
-// Обновленная функция addProduct для работы с попапом
-function addProduct() {
-    const form = document.getElementById('add-product-form');
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-    
-    if (!form) return;
+	function closeProductPopup() {
+		const popup = document.getElementById('product-popup');
+		if (popup) {
+			popup.classList.remove('active');
+		}
+	}
 
-    const formData = new FormData(form);
 
-    // Валидация данных
-    if (!validateProductForm(formData)) {
-        return;
-    }
+	function initMealsPopup() {
+		const openBtn = document.getElementById('open-meals-popup');
+		const closeBtn = document.getElementById('close-meals-popup');
+		const cancelBtn = document.getElementById('cancel-meals-form');
+		const popup = document.getElementById('meals-popup');
+		const form = document.getElementById('add-meals-form');
 
-    // Показываем индикатор загрузки
-    submitBtn.textContent = 'Добавление...';
-    submitBtn.disabled = true;
+		console.log(openBtn);
 
-    const data = {
-        action: 'add_product',
-        nonce: nutrition_ajax.nonce
-    };
+		// Открытие попапа
+		if (openBtn) {
+			openBtn.addEventListener('click', openMealsPopup);
+		}
 
-    // Добавляем данные формы
-    for (const [key, value] of formData.entries()) {
-        data[key] = value;
-    }
+		// Закрытие попапа
+		if (closeBtn) {
+			closeBtn.addEventListener('click', closeMealsPopup);
+		}
 
-    ajaxRequest(data, function(response) {
-        // Восстанавливаем кнопку
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
+		if (cancelBtn) {
+			cancelBtn.addEventListener('click', closeMealsPopup);
+		}
 
-        if (response.success) {
-            showNotification('Продукт успешно добавлен!', 'success');
-            form.reset();
-            closeProductPopup();
-            loadProducts(); // Перезагружаем список продуктов
-        } else {
-            showNotification('Ошибка: ' + response.data, 'error');
-        }
-    }, function(error) {
-        // Восстанавливаем кнопку при ошибке
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-        showNotification('Ошибка сети при добавлении продукта', 'error');
-    });
-}
+		// Закрытие по клику на overlay
+		if (popup) {
+			popup.addEventListener('click', function (e) {
+				if (e.target === popup) {
+					closeMealsPopup();
+				}
+			});
+		}
 
-// Функция валидации формы
-function validateProductForm(formData) {
-    const name = formData.get('name')?.toString().trim();
-    const proteins = parseFloat(formData.get('proteins'));
-    const carbs = parseFloat(formData.get('carbs'));
-    const fats = parseFloat(formData.get('fats'));
-    const calories = parseFloat(formData.get('calories'));
+		// Закрытие по ESC
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && popup.classList.contains('active')) {
+				closeMealsPopup();
+			}
+		});
 
-    if (!name || name.length < 2) {
-        showNotification('Название продукта должно быть не менее 2 символов', 'error');
-        return false;
-    }
+		// Обработка отправки формы
+		if (form) {
+			form.addEventListener('submit', function (e) {
+				e.preventDefault();
+				// addProduct();
+			});
+		}
+	}
 
-    if (isNaN(proteins) || proteins < 0) {
-        showNotification('Белки должны быть положительным числом', 'error');
-        return false;
-    }
+	function openMealsPopup() {
+		const popup = document.getElementById('meals-popup');
+		const form = document.getElementById('add-meal-form');
 
-    if (isNaN(carbs) || carbs < 0) {
-        showNotification('Углеводы должны быть положительным числом', 'error');
-        return false;
-    }
+		if (popup && form) {
+			popup.classList.add('active');
+			// Очищаем форму при открытии
+			form.reset();
+			// Фокусируемся на первом поле
+			const firstInput = form.querySelector('input[name="name"]');
+			if (firstInput) {
+				setTimeout(() => firstInput.focus(), 100);
+			}
+		}
+	}
 
-    if (isNaN(fats) || fats < 0) {
-        showNotification('Жиры должны быть положительным числом', 'error');
-        return false;
-    }
+	function closeMealsPopup() {
+		const popup = document.getElementById('meals-popup');
+		if (popup) {
+			popup.classList.remove('active');
+			steps[1].classList.remove('active');
+			steps[0].classList.add('active');
+		}
+	}
 
-    if (isNaN(calories) || calories < 0) {
-        showNotification('Калории должны быть положительным числом', 'error');
-        return false;
-    }
 
-    return true;
-}
+	// Обновленная функция addProduct для работы с попапом
+	function addProduct() {
+		const form = document.getElementById('add-product-form');
+		const submitBtn = form.querySelector('button[type="submit"]');
+		const originalText = submitBtn.textContent;
+
+		if (!form) return;
+
+		const formData = new FormData(form);
+
+		// Валидация данных
+		if (!validateProductForm(formData)) {
+			return;
+		}
+
+		// Показываем индикатор загрузки
+		submitBtn.textContent = 'Добавление...';
+		submitBtn.disabled = true;
+
+		const data = {
+			action: 'add_product',
+			nonce: nutrition_ajax.nonce
+		};
+
+		// Добавляем данные формы
+		for (const [key, value] of formData.entries()) {
+			data[key] = value;
+		}
+
+		ajaxRequest(data, function (response) {
+			// Восстанавливаем кнопку
+			submitBtn.textContent = originalText;
+			submitBtn.disabled = false;
+
+			if (response.success) {
+				showNotification('Продукт успешно добавлен!', 'success');
+				form.reset();
+				closeProductPopup();
+				loadProducts(); // Перезагружаем список продуктов
+			} else {
+				showNotification('Ошибка: ' + response.data, 'error');
+			}
+		}, function (error) {
+			// Восстанавливаем кнопку при ошибке
+			submitBtn.textContent = originalText;
+			submitBtn.disabled = false;
+			showNotification('Ошибка сети при добавлении продукта', 'error');
+		});
+	}
+
+	// Функция валидации формы
+	function validateProductForm(formData) {
+		const name = formData.get('name')?.toString().trim();
+		const proteins = parseFloat(formData.get('proteins'));
+		const carbs = parseFloat(formData.get('carbs'));
+		const fats = parseFloat(formData.get('fats'));
+		const calories = parseFloat(formData.get('calories'));
+
+		if (!name || name.length < 2) {
+			showNotification('Название продукта должно быть не менее 2 символов', 'error');
+			return false;
+		}
+
+		if (isNaN(proteins) || proteins < 0) {
+			showNotification('Белки должны быть положительным числом', 'error');
+			return false;
+		}
+
+		if (isNaN(carbs) || carbs < 0) {
+			showNotification('Углеводы должны быть положительным числом', 'error');
+			return false;
+		}
+
+		if (isNaN(fats) || fats < 0) {
+			showNotification('Жиры должны быть положительным числом', 'error');
+			return false;
+		}
+
+		if (isNaN(calories) || calories < 0) {
+			showNotification('Калории должны быть положительным числом', 'error');
+			return false;
+		}
+
+		return true;
+	}
+
+	// Переход к следующему шагу
+	nextBtn.addEventListener('click', function () {
+		// Проверяем, что выбрана дата и тип приема пищи
+		const dateInput = document.querySelector('input[name="meal_date"]');
+		const mealTypeSelected = document.querySelector('input[name="meal_type"]:checked');
+
+		if (dateInput.value && mealTypeSelected) {
+			steps[0].classList.remove('active');
+			steps[1].classList.add('active');
+		} else {
+			showNotification('Пожалуйста, заполните все поля', type = 'error');
+		}
+	});
+
+	// Возврат к предыдущему шагу
+	prevBtn.addEventListener('click', function () {
+		steps[1].classList.remove('active');
+		steps[0].classList.add('active');
+	});
 
 });
