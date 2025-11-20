@@ -552,7 +552,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		const container = document.getElementById('weekly-summary');
 		if (!container) return;
 
-		const avgCalories = Math.round(summary.total_calories / 7);
+		const dayOfWeek = new Date().getDay();
+		const daysCount = dayOfWeek === 0 ? 7 : dayOfWeek;
+
+		const avgCalories = Math.round(summary.total_calories / daysCount);
+
+		// const avgCalories = Math.round(summary.total_calories / 7);
 		const goalCompletion = summary.calorie_goal ? Math.round((summary.total_calories / (summary.calorie_goal * 7)) * 100) : 0;
 
 		html = `

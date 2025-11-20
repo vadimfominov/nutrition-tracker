@@ -93,7 +93,7 @@
 										<label for="breakfast" class="radio-label">Завтрак</label>
 
 										<input type="radio" id="snack1" name="meal_type" value="snack" class="radio-option">
-										<label for="snack1" class="radio-label">Перекус 11.00</label>
+										<label for="snack1" class="radio-label">Перекус</label>
 
 										<input type="radio" id="lunch" name="meal_type" value="lunch" class="radio-option">
 										<label for="lunch" class="radio-label">Обед</label>
