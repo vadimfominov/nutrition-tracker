@@ -343,9 +343,15 @@ button[type="submit"]:hover {
 	align-items: center;
 	justify-content: center;
 	gap: 4px;
-	padding-bottom: 5px;
+	padding-bottom: 12px;
 	padding-top: 5px;
-	border-bottom: 2px solid transparent;
+	border-bottom: 4px solid transparent;
+}
+.tab-button:first-child {
+	padding-left: 10px;
+}
+.tab-button:last-child {
+	padding-right: 10px;
 }
 
 .tab-button::before {
@@ -376,7 +382,7 @@ button[type="submit"]:hover {
 .tab-button.active {
 	color: #007bff;
 	background: rgba(0, 123, 255, 0.1);
-	border-bottom: 2px solid #007bff;
+	border-bottom: 4px solid #007bff;
 }
 /* Сообщения */
 .auth-message {
