@@ -279,23 +279,10 @@ button[type="submit"]:hover {
 /* Контент вкладок */
 .tab-content {
 	display: none;
-	animation: fadeIn 0.3s ease;
 }
 
 .tab-content.active {
 	display: block;
-}
-
-@keyframes fadeIn {
-	from {
-		opacity: 0;
-		transform: translateY(10px);
-	}
-
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
 }
 
 .tab-content h3 {
@@ -336,7 +323,7 @@ button[type="submit"]:hover {
 	right: 0;
 	background: white;
 	display: flex;
-	padding: 12px 10px;
+	padding: 0px;
 	border-top: 1px solid #e9ecef;
 	box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
 	z-index: 1000;
@@ -346,8 +333,6 @@ button[type="submit"]:hover {
 	flex: 1;
 	background: none;
 	border: none;
-	padding: 12px 8px;
-	border-radius: 12px;
 	font-size: 12px;
 	font-weight: 500;
 	color: #6c757d;
@@ -356,7 +341,11 @@ button[type="submit"]:hover {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	justify-content: center;
 	gap: 4px;
+	padding-bottom: 5px;
+	padding-top: 5px;
+	border-bottom: 2px solid transparent;
 }
 
 .tab-button::before {
@@ -380,17 +369,15 @@ button[type="submit"]:hover {
 	content: "👤";
 }
 
+.tab-button[data-tab="home"]::before {
+	content: "🏠";
+}
+
 .tab-button.active {
 	color: #007bff;
 	background: rgba(0, 123, 255, 0.1);
-	transform: translateY(-2px);
+	border-bottom: 2px solid #007bff;
 }
-
-.tab-button:hover {
-	color: #007bff;
-	background: rgba(0, 123, 255, 0.05);
-}
-
 /* Сообщения */
 .auth-message {
 	padding: 12px;
@@ -465,10 +452,6 @@ button[type="submit"]:hover {
 
 .weekly-details,
 .weekly-summary {
-	/* background: white; */
-	/* padding: 20px; */
-	/* border-radius: 16px; */
-
 	margin-bottom: 20px;
 }
 
@@ -493,7 +476,6 @@ button[type="submit"]:hover {
 
 	.tab-button {
 		font-size: 11px;
-		padding: 10px 6px;
 	}
 
 	.tab-button::before {
@@ -504,47 +486,6 @@ button[type="submit"]:hover {
 /* Плавная прокрутка */
 html {
 	scroll-behavior: smooth;
-}
-
-/* Улучшение доступности */
-@media (prefers-reduced-motion: reduce) {
-	* {
-		animation-duration: 0.01ms !important;
-		animation-iteration-count: 1 !important;
-		transition-duration: 0.01ms !important;
-	}
-}
-
-/* Темная тема (опционально) */
-@media (prefers-color-scheme: dark) {
-	.nutrition-tracker {
-		background: #1a1a1a;
-		color: #ffffff;
-	}
-
-	.auth-container,
-	.tab-content,
-	.weekly-chart-container,
-	.weekly-details,
-	.weekly-summary {
-		background: #2d2d2d;
-		color: #ffffff;
-	}
-
-	.form-group input,
-	.form-group select {
-		background: #3d3d3d;
-		border-color: #4d4d4d;
-		color: #ffffff;
-	}
-
-	.form-group label {
-		color: #cccccc;
-	}
-
-	.products-selection {
-		background: #2d2d2d;
-	}
 }
 
 .summary-stat {
@@ -766,8 +707,8 @@ html {
 /* Название продукта */
 .product-name {
 	flex: 1;
-	font-size: 16px;
-	font-weight: 600;
+	font-size: 13px;
+	font-weight: 500;
 	color: #2d3748;
 	transition: all 0.3s ease;
 }
@@ -792,13 +733,12 @@ html {
 .grams-input {
 	width: 100%;
 	padding: 10px 12px;
-	border: 2px solid #e2e8f0;
-	border-radius: 8px;
-	font-size: 14px;
-	font-weight: 500;
+	border: 1px solid #e2e8f0;
+	border-radius: 4px;
+	font-size: 13px;
+	font-weight: 400;
 	text-align: center;
 	background: white;
-	transition: all 0.3s ease;
 }
 
 .grams-input:focus {
@@ -825,25 +765,6 @@ html {
 
 .product-selection-item.selected .product-nutrition {
 	display: block;
-}
-
-/* Анимация выбора */
-@keyframes selectProduct {
-	0% {
-		transform: translateX(0);
-	}
-
-	50% {
-		transform: translateX(0px);
-	}
-
-	100% {
-		transform: translateX(0px);
-	}
-}
-
-.product-selection-item.selected {
-	animation: selectProduct 0.4s ease;
 }
 
 /* Стили для пустого состояния */
@@ -904,7 +825,7 @@ html {
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 12px;
-		padding: 15px;
+		padding: 5px 10px;
 	}
 
 	.product-grams {
@@ -1213,39 +1134,6 @@ html {
 	background: white;
 	border-radius: 8px;
 	border: 1px solid #e9ecef;
-}
-
-/* Анимации */
-@keyframes mealItemAppear {
-	from {
-		opacity: 0;
-		transform: translateY(10px);
-	}
-
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
-
-.meal-item {
-	animation: mealItemAppear 0.4s ease;
-}
-
-.meal-item:nth-child(2) {
-	animation-delay: 0.1s;
-}
-
-.meal-item:nth-child(3) {
-	animation-delay: 0.2s;
-}
-
-.meal-item:nth-child(4) {
-	animation-delay: 0.3s;
-}
-
-.meal-item:nth-child(5) {
-	animation-delay: 0.4s;
 }
 
 /* Стили для пустого состояния */
@@ -1683,35 +1571,6 @@ html {
 	transform: scale(1.1) rotate(15deg);
 }
 
-/* Анимации появления */
-@keyframes cardAppear {
-	from {
-		opacity: 0;
-		transform: translateY(20px) scale(0.9);
-	}
-
-	to {
-		opacity: 1;
-		transform: translateY(0) scale(1);
-	}
-}
-
-.product-card {
-	animation: cardAppear 0.6s ease;
-}
-
-.product-card:nth-child(1) {
-	animation-delay: 0.1s;
-}
-
-.product-card:nth-child(2) {
-	animation-delay: 0.2s;
-}
-
-.product-card:nth-child(3) {
-	animation-delay: 0.3s;
-}
-
 /* Стили для пустого состояния */
 .products-grid:empty::before {
 	content: "📦 У вас пока нет продуктов";
@@ -2111,7 +1970,7 @@ input[type="date"] {
 .products-selection {
 	border: 1px solid #ddd;
 	border-radius: 4px;
-	padding: 10px;
+	padding: 10px 0px;
 	min-height: 150px;
 }
 
@@ -2192,4 +2051,9 @@ input[type="date"] {
 		transform: translate(30%, 30%) scale(1.2);
 		opacity: 0.3;
 	}
+}
+
+#home-tab {
+	padding-left: 10px;
+	padding-right: 10px;
 }
